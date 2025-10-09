@@ -1,0 +1,12 @@
+# web_server/tasks/main.yml
+---
+- name: Debian系 (Debian/Ubuntu) のApacheインストールタスクを実行
+  ansible.builtin.include_tasks: 
+    file: install_debian.yml
+  when: ansible_os_family == "Debian"
+
+- name: RedHat系 (RHEL/CentOS/Fedora) のHttpdインストールタスクを実行
+  ansible.builtin.include_tasks: 
+    file: install_redhat.yml
+  when: ansible_os_family == "RedHat"
+

@@ -1,0 +1,23 @@
+---
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: yes
+  become: yes
+
+- name: Get upgradable packages list
+  # apt list --upgradableを実行し、結果をapt_list_result変数に格納
+  ansible.builtin.shell: apt list --upgradable
+  register: apt_list_result
+  become: yes
+  tags: [fetch]
+
+- name: Write package list to file on controller
+  ansible.builtin.copy:
+    content: "{{ apt_list_result.stdout }}\n"
+    dest: "{{ fetch_dest }}/upgradable_packages/{{ inventory_hostname }}"
+  delegate_to: localhost
+  become: no # 制御ノード側のユーザー権限で実行
+  # apt list --upgradable はパッケージがない場合もrc=0で実行成功するため、
+  # changedが起きたか（リスト内容があるか）に関わらず実行することが多い
+  when: apt_list_result.rc == 0
+  tags: [fetch]

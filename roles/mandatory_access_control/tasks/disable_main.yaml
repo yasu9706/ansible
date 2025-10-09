@@ -1,0 +1,10 @@
+---
+- name: Disable Apparmor in Debian family
+  ansible.builtin.include_tasks:
+    file: disable_apparmor.yaml
+  when: ansible_os_family == "Debian"
+
+    #- name: Disable SELinux in Redhat family
+    #  ansible.builtin.include_tasks:
+    #    file: disable_redhat.yaml
+    #  when: ansible_os_family == "RedHat"

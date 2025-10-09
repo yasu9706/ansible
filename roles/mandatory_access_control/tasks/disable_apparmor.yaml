@@ -1,0 +1,12 @@
+---
+- name: 'Add an expression apparmor="" to GRUB_CMDLINE_LINUX'
+  # https://pim.kun.is/ansible-edit-grub/
+  community.general.ini_file:
+    path: /etc/default/grub
+    section: null
+    option: GRUB_CMDLINE_LINUX
+    value: '"apparmor=0"'
+    exclusive: false
+    state: present
+    no_extra_spaces: true
+  notify: Update grub

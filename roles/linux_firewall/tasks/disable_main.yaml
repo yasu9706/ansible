@@ -1,0 +1,11 @@
+---
+- name: disable ufw and stop the service in Debian family
+  ansible.builtin.include_tasks:
+    file: disable_debian.yaml
+  when: ansible_os_family == "Debian"
+
+    #- name: disable firewalld and stop the service in Redhat family
+    #  ansible.builtin.include_tasks:
+    #    file: disable_redhat.yaml
+    #  when: ansible_os_family == "RedHat"
+

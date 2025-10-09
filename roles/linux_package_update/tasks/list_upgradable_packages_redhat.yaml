@@ -1,0 +1,31 @@
+---
+- name: (Register RedHat) Get upgradable packages list using dnf/yum check-update
+  # dnf/yum check-updateを実行し、結果をpkg_list_result変数に格納
+  ansible.builtin.shell: |
+    if command -v dnf >/dev/null 2>&1; then
+      dnf check-update --assumeyes
+    elif command -v yum >/dev/null 2>&1; then
+      yum check-update
+    else
+      exit 1
+    fi
+  register: pkg_list_result
+  become: yes
+  # dnf check-updateは、アップグレード対象が存在する場合にrc=100を返す
+  # rc=0またはrc=100であれば、コマンド実行自体は成功とみなす
+  changed_when: pkg_list_result.rc == 100
+  tags: [fetch]
+
+- name: (Register RedHat) Write package list to file on controller
+  # 制御ノード (localhost) 上で実行し、変数の内容をファイルに書き出す
+  ansible.builtin.copy:
+    # 変数に格納された標準出力の内容を、contentとしてファイルに書き込む
+    content: "{{ pkg_list_result.stdout }}\n"
+    # 絶対パス: /home/ubuntu/ansible/fetched_files/upgradable_packages/ホスト名
+    dest: "{{ fetch_dest }}/upgradable_packages/{{ inventory_hostname }}"
+    # contentが変更されない限り、このタスクはchangedにならない（冪等性の確保）
+  delegate_to: localhost
+  become: no # 制御ノードでの操作は権限昇格不要
+  # コマンド実行が失敗していない場合（rc=0またはrc=100）にのみ実行する
+  when: pkg_list_result.rc in [0, 100]
+  tags: [fetch]

@@ -1,0 +1,7 @@
+---
+- name: Run package updates using the role
+  hosts: all
+  gather_facts: yes
+  become: yes
+  roles:
+    - linux_package_update

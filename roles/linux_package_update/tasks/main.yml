@@ -1,0 +1,10 @@
+---
+- name: Include Ubuntu-specific tasks if the OS family is Debian
+  ansible.builtin.import_tasks:
+    file: update_debian.yaml
+  when: ansible_os_family == "Debian"
+
+- name: Include Rocky Linux-specific tasks if the OS family is RedHat
+  ansible.builtin.import_tasks:
+    file: update_redhat.yaml
+  when: ansible_os_family == "RedHat"

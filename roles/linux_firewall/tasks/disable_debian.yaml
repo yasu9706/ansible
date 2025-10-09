@@ -1,0 +1,10 @@
+---
+- name: disable ufw service
+  ansible.builtin.service:
+    name: ufw
+    enabled: false
+
+- name: stop ufw service
+  ansible.builtin.service:
+    name: ufw
+    state: stopped

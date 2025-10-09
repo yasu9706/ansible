@@ -1,0 +1,7 @@
+---
+- name: Install apache web server using the role
+  hosts: all
+  gather_facts: yes
+  become: yes
+  roles:
+    - web_server

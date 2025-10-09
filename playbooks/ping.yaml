@@ -1,0 +1,6 @@
+---
+- name: Ping test using ansible.cfg and inventory file
+  hosts: all
+  gather_facts: no
+  roles:
+    - ping

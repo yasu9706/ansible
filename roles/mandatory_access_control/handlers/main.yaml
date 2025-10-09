@@ -1,0 +1,4 @@
+- name: Update grub
+  ansible.builtin.include_tasks:
+    file: update_grub.yaml
+

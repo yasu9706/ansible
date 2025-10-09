@@ -1,0 +1,12 @@
+ubuntu01 ansible_host=0.0.0.0 ansible_become_password=ansible ansible_user=ansible
+rocky01  ansible_host=0.0.0.2 ansible_become_password=ansible ansible_user=ansible
+
+[agent]
+ubuntu01
+rocky01
+
+[ubuntu_agent]
+ubuntu01
+
+[rocky_agent]
+rocky01

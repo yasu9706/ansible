@@ -1,0 +1,19 @@
+---
+- name: Get upgradable packages list in Debian family hosts
+  ansible.builtin.include_tasks:
+    file: list_upgradable_packages_debian.yaml
+  # Ubuntu専用のタスクではないが、aptコマンドに依存するためDebian系で実行するのが安全
+  when: ansible_os_family == "Debian"
+  tags:
+    - fetch
+    - always # Playbook全体で実行されるようにしたい場合
+
+- name: Get upgradable packages list in Red hat family hosts
+  ansible.builtin.include_tasks:
+    file: list_upgradable_packages_redhat.yaml
+  # Ubuntu専用のタスクではないが、aptコマンドに依存するためDebian系で実行するのが安全
+  when: ansible_os_family == "RedHat"
+  tags:
+    - fetch
+    - always # Playbook全体で実行されるようにしたい場合
+
