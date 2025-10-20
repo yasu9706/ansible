@@ -1,0 +1,38 @@
+---
+#- name: install required packages
+
+- name: register contents in "Out of contorol from ansible"
+  ansible.builtin.shell: |
+    sed -n '/# Out of control from ansible/ {
+      n
+      n
+      :a
+      p
+      n
+      ba
+    }' '~{{ target_user }}/.bashrc'
+  register: sed_result
+  changed_when: false
+  failed_when: sed_result.rc != 0 and sed_result.rc != 2
+
+- name: 抽出内容をチェックし、エラー時は空文字列を設定
+  ansible.builtin.set_fact:
+    out_of_control_content: '{{ sed_result.stdout if sed_result.rc == 0 else "" }} '
+
+- name: distribute test file to specific user
+  # following variables are used in templates
+  # change the value in playbook in order to load additional templates
+  vars:
+    # neccesary, play may fail when these vars are not declared
+
+    # optional, may be changed in playbooks
+    # customized_prompt: false
+    # customized_history: false
+
+  # the variable `target_user` must be declared in playbooks
+  ansible.builtin.template:
+    src: bashrc/base.j2
+    dest: '~{{ target_user }}/.bashrc'
+    owner: '{{ target_user }}'
+    group: '{{ target_user }}'
+
