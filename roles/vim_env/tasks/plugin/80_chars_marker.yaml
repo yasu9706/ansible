@@ -1,0 +1,8 @@
+---
+- name: distribute plugin file '80_chars_marker.vim'
+  ansible.builtin.copy:
+    src: plugin/80_chars_marker.vim
+    dest: "~{{target_user}}/.vim/plugin/80_chars_marker.vim"
+    owner: "{{target_user}}"
+    group: "{{target_user}}"
+
