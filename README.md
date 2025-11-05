@@ -8,10 +8,12 @@ NECESSARY=(ansible)
 RECOMMENDED=(ansible-lint)
 sudo apt update && sudo apt install ${NECESSARY[@]} ${RECOMMENDED[@]}
 
-# initialize ansible.cfg
-# run below in the git working tree root
-sed -e "s|^inventory=.*\$|inventory=$PWD/inventory.ini|" -i ./ansible.cfg
-
+# Initialize ansible.cfg
+# Run below in the git working tree root
+# (Since `$PWD` includes `/` in its value, you should use `|`, comma,
+# or any other character from `/` as delimiter)
+sed "s|^\(inventory=\).*\$|\1$PWD/inventory.ini|" -i ./ansible.cfg
+sed "s|^\(ansible_base_dir: \).*\$|\1$PWD|"       -i ./vars/all.yaml
 ```
 
 ## Requirements

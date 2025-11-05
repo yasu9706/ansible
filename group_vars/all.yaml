@@ -1,4 +1,4 @@
 ---
-ansible_base_dir: /home/ubuntu/ansible
+ansible_base_dir: /home/yasu/ansible
 fetch_dest: "{{ ansible_base_dir }}/fetch_dest"
 role_dir: "{{ ansible_base_dir }}/roles"
