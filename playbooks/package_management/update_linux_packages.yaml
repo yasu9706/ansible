@@ -1,0 +1,10 @@
+---
+- name: Run package updates using the role
+  hosts: all
+  gather_facts: yes
+  become: yes
+  tasks:
+    - name: run update
+      ansible.builtin.include_role:
+        name: linux_packages
+        tasks_from: run_update/main.yaml

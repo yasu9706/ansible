@@ -1,0 +1,19 @@
+---
+- name: list upgradable packages
+  hosts: all
+  gather_facts: yes
+  tasks:
+    - name: Create destination directory on controller
+      ansible.builtin.file:
+        path: "{{ fetch_dest }}/upgradable_packages"
+        state: directory
+        mode: '0755'
+      delegate_to: localhost
+      run_once: true
+      become: no    # Can I remove this line?
+
+    - name: check updates and retrieve upgradable package list
+      ansible.builtin.include_role:
+        name: linux_packages
+        tasks_from: list_upgradable/main.yaml
+
