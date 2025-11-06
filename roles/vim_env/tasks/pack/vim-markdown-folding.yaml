@@ -1,0 +1,14 @@
+---
+- name: create parent dir as destination of git clone
+  ansible.builtin.file:
+    path: "~{{target_user}}/.vim/pack/plugins/start"
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    state: directory
+- name: git clone vim-markdown-folding
+  ansible.builtin.git:
+    clone: true
+    repo: https://github.com/masukomi/vim-markdown-folding.git
+    dest: "~{{target_user}}/.vim/pack/plugins/start/vim-markdown-folding"
+
+

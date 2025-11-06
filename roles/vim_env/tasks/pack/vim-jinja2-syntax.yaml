@@ -1,0 +1,13 @@
+---
+- name: create parent dir as destination of git clone
+  ansible.builtin.file:
+    path: "~{{target_user}}/.vim/pack/plugins/start"
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    state: directory
+- name: git clone vim-jinja2-syntax
+  ansible.builtin.git:
+    clone: true
+    repo: https://github.com/Glench/Vim-Jinja2-Syntax.git
+    dest: "~{{target_user}}/.vim/pack/plugins/start/vim-jinja2-syntax"
+
