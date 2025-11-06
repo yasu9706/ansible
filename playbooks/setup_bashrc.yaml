@@ -1,0 +1,13 @@
+---
+- name: Setup bashrc
+  hosts: all
+  gather_facts: yes
+  become: yes
+  vars:
+    target_user: ansible
+    customized_history: true
+  tasks:
+  - ansible.builtin.include_role:
+      name: bash_env
+      tasks_from: bashrc.yaml
+

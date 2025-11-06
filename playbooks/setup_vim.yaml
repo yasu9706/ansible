@@ -1,0 +1,33 @@
+---
+- name: Setup vim
+  hosts: all
+  gather_facts: yes
+  become: yes
+  vars:
+    target_user: ansible
+  tasks:
+  - ansible.builtin.include_role:
+      name: vim_env
+      tasks_from: distribute_minimum_vimrc.yaml
+  - ansible.builtin.include_role:
+      name: vim_env
+      tasks_from: plugin/configure_userhome_runtimepath.yaml
+  - ansible.builtin.include_role:
+      name: vim_env
+      tasks_from: plugin/vim-tmp.yaml
+  - ansible.builtin.include_role:
+      name: vim_env
+      tasks_from: plugin/filetype_override.yaml
+  - ansible.builtin.include_role:
+      name: vim_env
+      tasks_from: plugin/keymaps.yaml
+  - ansible.builtin.include_role:
+      name: vim_env
+      tasks_from: plugin/wildmenu.yaml
+  - ansible.builtin.include_role:
+      name: vim_env
+      tasks_from: plugin/80_chars_marker.yaml
+
+
+
+

@@ -1,0 +1,7 @@
+---
+- name: distribute plugin file 'filetype_override.vim'
+  ansible.builtin.copy:
+    src: plugin/filetype_override.vim
+    dest: "~{{target_user}}/.vim/plugin/filetype_override.vim"
+    owner: "{{target_user}}"
+    group: "{{target_user}}"

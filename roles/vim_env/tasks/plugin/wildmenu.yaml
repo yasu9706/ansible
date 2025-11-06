@@ -1,0 +1,8 @@
+---
+- name: distribute plugin file 'wildmenu.vim'
+  ansible.builtin.copy:
+    src: plugin/wildmenu.vim
+    dest: "~{{target_user}}/.vim/plugin/wildmenu.vim"
+    owner: "{{target_user}}"
+    group: "{{target_user}}"
+

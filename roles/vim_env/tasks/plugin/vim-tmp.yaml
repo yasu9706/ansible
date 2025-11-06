@@ -1,0 +1,32 @@
+---
+  # variable `target_user` must be defined in playbook
+- name: create directory `~/.vim/back`
+  ansible.builtin.file:
+    path: "~{{target_user}}/.vim/back"
+    owner: "{{target_user}}"
+    group: "{{target_user}}"
+    state: directory
+- name: create directory `~/.vim/swap`
+  ansible.builtin.file:
+    path: "~{{target_user}}/.vim/swap"
+    owner: "{{target_user}}"
+    group: "{{target_user}}"
+    state: directory
+- name: create directory `~/.vim/undo`
+  ansible.builtin.file:
+    path: "~{{target_user}}/.vim/undo"
+    owner: "{{target_user}}"
+    group: "{{target_user}}"
+    state: directory
+- name: create directory `~/.vim/view`
+  ansible.builtin.file:
+    path: "~{{target_user}}/.vim/view"
+    owner: "{{target_user}}"
+    group: "{{target_user}}"
+    state: directory
+- name: distribute plugin file
+  ansible.builtin.copy:
+    src: plugin/vim-tmp.vim
+    dest: "~{{target_user}}/.vim/plugin/vim-tmp.vim"
+    owner: "{{target_user}}"
+    group: "{{target_user}}"

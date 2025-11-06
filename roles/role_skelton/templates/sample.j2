@@ -1,0 +1,17 @@
+This is a sample template
+
+{#- The content of component1.j2 will be inserted below -#}
+{{ lookup('template', 'component1.j2') }}
+
+{#- 
+    The content of component2.j2 will be inserted below
+    when the variable enable_component2 with it's value true.
+
+    If you don't want to apply the content of component2.j2
+    you don't have to even declare the variable.
+
+    When the value of enable_component2 is not either true/false
+    or compatible value (such as 1/0, yes/no, on/off),
+    the content of component2.j2 will not be applied.
+    -#}
+{% if enable_component2 | default(false) | bool %}{{ lookup('template', 'component2.j2') }}{% endif %}

@@ -1,0 +1,13 @@
+---
+- name: Install packages using apt in Debian family hosts
+  ansible.builtin.include_tasks:
+    # Variable `role_name` is automatically defined by ansible.
+    # See 'Special Varialbles' page from official documents.
+    file: "{{ role_dir }}/{{ role_name }}/tasks/repo_install/debian.yaml"
+  when: ansible_os_family == "Debian"
+
+- name: Install packages using dnf in Red hat family hosts
+  ansible.builtin.include_tasks:
+    file: "{{ role_dir }}/{{role_name }}/tasks/repo_install/redhat.yaml"
+  when: ansible_os_family == "RedHat"
+
