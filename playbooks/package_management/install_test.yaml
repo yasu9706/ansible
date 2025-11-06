@@ -1,0 +1,16 @@
+---
+- name: Install packages
+  hosts: all
+  gather_facts: yes
+  become: yes
+  vars:
+    packages:
+      debian:
+        - git
+      redhat:
+        - git
+  tasks:
+    - name: run update
+      ansible.builtin.include_role:
+        name: linux_packages
+        tasks_from: repo_install/main.yaml

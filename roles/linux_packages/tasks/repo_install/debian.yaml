@@ -1,0 +1,6 @@
+---
+- name: install packages using apt
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ packages.debian }}"
