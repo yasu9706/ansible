@@ -1,0 +1,17 @@
+---
+- name: install packages using dnf
+  ansible.builtin.dnf:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ packages.redhat }}"
+  when: ansible_pkg_mgr == "dnf"
+
+- name: install packages using yum
+  ansible.builtin.yum:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ packages.redhat }}"
+  when: ansible_pkg_mgr == "yum"
+
+# Note: Variable `ansible_pkg_mgr` is one of Fact variable
+
