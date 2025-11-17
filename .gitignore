@@ -1,1 +1,6 @@
 inventory.ini
+
+
+# host_vars
+host_vars/*
+!host_vars/sample.yaml

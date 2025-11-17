@@ -1,0 +1,7 @@
+---
+- name: enable repository
+  community.general.dnf_config_manager:
+    name: "{{ item }}"
+    state: enabled
+  loop: "{{ repos.redhat }}"
+  when: ansible_pkg_mgr == "dnf"
