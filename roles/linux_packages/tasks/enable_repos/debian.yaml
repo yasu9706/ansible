@@ -1,0 +1,7 @@
+---
+- name: enable repository
+  ansible.builtin.apt_repository:
+    name: "{{ item }}"
+    state: enabled
+  loop: "{{ repos.debian }}"
+
