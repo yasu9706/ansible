@@ -1,0 +1,45 @@
+---
+- name: Setup tmux
+  hosts: all
+  gather_facts: yes
+  become: yes
+  vars:
+    repos:
+      debian: []
+      redhat:
+        - crb
+    packages:
+      debian:
+        - tmux
+        - colorized-logs
+          #- yank
+      redhat:
+        - tmux
+        - colorized-logs
+          #- yank
+          #- xsel
+  tasks:
+  - ansible.builtin.include_role:
+      name: linux_packages
+      tasks_from: enable_repos/main.yaml
+  - ansible.builtin.include_role:
+      name: linux_packages
+      tasks_from: repo_install/main.yaml
+  - ansible.builtin.include_role:
+      name: tmux
+      tasks_from: distribute_minimum_tmux_conf.yaml
+  - ansible.builtin.include_role:
+      name: tmux
+      tasks_from: additional_configs/key_bindings.yaml
+  - ansible.builtin.include_role:
+      name: tmux
+      tasks_from: additional_configs/options.yaml
+        #  - ansible.builtin.include_role:
+        #      name: tmux
+        #      tasks_from: additional_configs/sharing_system_clipboard.yaml
+  - ansible.builtin.include_role:
+      name: tmux
+      tasks_from: additional_configs/status_bar.yaml
+  - ansible.builtin.include_role:
+      name: tmux
+      tasks_from: tmuxp.yaml

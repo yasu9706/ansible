@@ -1,11 +1,22 @@
-# README(role name)
+# tmux
 
 ## Overview 概要
+オンデマンドで管理対象ノードのtmux環境を構成する
 
+ミニマムな設定ファイルをベースに機能を追加する。
+基本的にはミニマムな設定、tmuxを最低限使えるようにするための設定を記載する。
+デフォルトの挙動とは大きく異なるような設定に関しては
+~/tmux/conf/配下にファイルを作成し、
+tmux.conf側ではそこを読み込む形で設定を行う。
 
-## Terminology 用語
+主なタスク
 
+- distribute_minimum_tmux_conf: tmux.confを配布する
 
+tmuxのパッケージインストールはplaybookから別ロールを呼び出して行う。
+
+## TODO
+- tmuxpのレイアウトファイルの編集
 
 Requirements
 ------------

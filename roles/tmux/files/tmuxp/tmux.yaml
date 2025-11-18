@@ -1,0 +1,17 @@
+session_name: tmux
+windows:
+  - window_name: task
+    layout: 37c4,188x48,0,0{94x48,0,0,0,93x48,95,0,1}
+    options:
+      automatic-rename: 'off'
+    panes:
+      - shell_command:
+        - ssh task-client
+        - clear
+      - start_directory: ~/
+  - layout: d080,188x48,0,0,3
+    focus: true
+    options: {}
+    panes:
+      - focus: 'true'
+        start_directory: ~/
