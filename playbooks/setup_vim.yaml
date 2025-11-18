@@ -27,7 +27,16 @@
   - ansible.builtin.include_role:
       name: vim_env
       tasks_from: plugin/80_chars_marker.yaml
-
-
-
+  - ansible.builtin.include_role:
+      name: vim_env
+      tasks_from: pack/lightline.yaml
+  - ansible.builtin.include_role:
+      name: vim_env
+      tasks_from: pack/vim-jinja2-syntax.yaml
+  - ansible.builtin.include_role:
+      name: vim_env
+      tasks_from: pack/vim-markdown-folding.yaml
+  - ansible.builtin.include_role:
+      name: vim_env
+      tasks_from: pack/vim-yaml-folds.yaml
 

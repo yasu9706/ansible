@@ -1,0 +1,19 @@
+---
+- name: create parent dir as destination of git clone
+  ansible.builtin.file:
+    path: "~{{target_user}}/.vim/pack/plugins/start"
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    state: directory
+- name: git clone lightline
+  ansible.builtin.git:
+    clone: true
+    repo: https://github.com/itchyny/lightline.vim.git
+    dest: "~{{target_user}}/.vim/pack/plugins/start/lightline"
+- name: set laststatus=2
+  ansible.builtin.copy:
+    dest: "~{{target_user}}/.vim/pack/plugins/start/lightline/plugin/set_laststatus2.vim"
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    content: |
+      set laststatus=2
