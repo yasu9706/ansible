@@ -1,0 +1,10 @@
+---
+# Variable `target_user` must be defined in the playbook or host_vars
+- name: copy config file
+  ansible.builtin.copy:
+    src: additional_config/status_bar.tmux
+    dest: "~{{ target_user }}/tmux/conf/status_bar.tmux"
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+
+

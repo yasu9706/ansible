@@ -1,0 +1,17 @@
+---
+# Following packages are required to use the keybind:
+# debian:
+#   - yank
+# redhat:
+#   - yank  (via epel repo)
+#   - xsel  (via epel repo)  (seem that either yank or xsel is required, not both)
+#
+# Variable `target_user` must be defined in the playbook or host_vars
+- name: copy config file
+  ansible.builtin.copy:
+    src: additional_config/key_bindings.tmux
+    dest: "~{{ target_user }}/tmux/conf/sharing_system_clipboard.tmux"
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+
+

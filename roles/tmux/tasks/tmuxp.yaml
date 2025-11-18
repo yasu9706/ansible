@@ -1,0 +1,49 @@
+---
+# Following packages are required to use the keybind:
+#   debian:
+#     - tmuxp
+#   redhat:
+#     - python3-tmuxp (via epel repository)
+#
+# Variable `target_user` must be defined in the playbook or host_vars
+- name: set environmental variable '$TMUXP_CONFIGDIR' in '.bash_profile'
+
+  # The task will fail when '.bash_profile' fails
+  ansible.builtin.lineinfile:
+    path: "~{{ target_user }}/.bash_profile"
+    regexp: "export TMUXP_CONFIGDIR=.*"
+    line: "export TMUXP_CONFIGDIR=~/tmux/tmuxp"
+    backrefs: false   # default, in case
+- name: mkdir '$TMUXP_CONFIGDIR'
+  ansible.builtin.file:
+    dest: "~{{ target_user }}/tmux/tmuxp"
+    state: directory
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+- name: set alias 'mux' as 'tmuxp load default'
+  ansible.builtin.lineinfile:
+    path: "~{{ target_user }}/.bash_aliases"
+    regexp: "alias mux=.*"
+    line: "alias mux='tmuxp load default'"
+    backrefs: false   # default, in case
+- name: copy tmuxp layout files
+  ansible.builtin.copy:
+
+    # Note that the presence or absence of ‘/’ at the end of 'src' changes the behavior.
+    # See 'USAGE' section in 'man rsync'
+    src: tmuxp/
+    dest: "~{{ target_user }}/tmux/tmuxp"
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+
+- name: create symbolic link 'default.yaml' reffering {{ tmuxp.default_file }}
+  # Varialble 'tmuxp.default_file' is defined in defaults/all.yaml
+  # It can be overriden in playbooks or group_vars, host_vars, etc.
+  # It
+  ansible.builtin.file:
+    src: "~{{ target_user }}/tmux/tmuxp/{{ tmuxp.default_file }}"
+    dest: "~{{ target_user }}/tmux/tmuxp/default.yaml" 
+    state: link
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+

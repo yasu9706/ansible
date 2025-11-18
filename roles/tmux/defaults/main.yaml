@@ -1,0 +1,4 @@
+---
+# defaults file for role_skelton
+tmuxp:
+  default_file: tmux.yaml

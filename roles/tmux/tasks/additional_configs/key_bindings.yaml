@@ -1,0 +1,14 @@
+---
+# Following packages are required to use the keybind:
+# debian:
+#   - colorized-logs
+# redhat:
+#   - colorized-logs  (via epel repo)
+#
+# Variable `target_user` must be defined in the playbook or host_vars
+- name: copy config file
+  ansible.builtin.copy:
+    src: additional_config/key_bindings.tmux
+    dest: "~{{ target_user }}/tmux/conf/key_bindings.tmux"
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
