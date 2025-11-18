@@ -1,0 +1,14 @@
+---
+- name: copy tmux.conf
+  ansible.builtin.copy:
+    src: minimum_conf.tmux
+    dest: "~{{target_user}}/.tmux.conf"
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+- name: make directory '~/tmux/conf'
+  ansible.builtin.file:
+    path: "~{{target_user}}/tmux/conf"
+    state: directory
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    recurse: true
