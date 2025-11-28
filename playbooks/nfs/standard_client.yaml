@@ -1,0 +1,20 @@
+---
+- name: Configure standard nfs client
+  hosts: all
+  gather_facts: yes
+  become: yes
+  vars:
+    packages:
+      debian:
+        - nfs-common
+      redhat:
+        - nfs-utils
+  tasks:
+  - ansible.builtin.include_role:
+      name: linux_packages
+      tasks_from: repo_install/main.yaml
+  - ansible.builtin.include_role:
+      name: nfs
+      tasks_from: client/without_directory_services.yaml
+
+

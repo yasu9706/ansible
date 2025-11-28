@@ -29,7 +29,7 @@
     # customized_prompt: false
     # customized_history: false
 
-  # the variable `target_user` must be declared in playbooks
+  # Variable `target_user` must be defined in the playbook or host_vars
   ansible.builtin.template:
     src: bashrc/base.j2
     dest: '~{{ target_user }}/.bashrc'

@@ -1,0 +1,8 @@
+# NFS Exports configuration managed by Ansible
+
+{% for export in nfs_config.server.exports %}
+{{ export.exporting_dir }}
+{%- for acl_entry in export.acl %}
+    {{ acl_entry.host }}({{ acl_entry.options | join(',') }})
+{%- endfor %}
+{% endfor %}
