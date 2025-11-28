@@ -1,19 +1,19 @@
 ---
-# Following packages are required to use the keybind:
-#   debian:
-#     - nfs-kernel-server
-#   redhat:
-#     - nfs-utils
+# Following packages are required
+#   debian:
+#     - nfs-kernel-server
+#   redhat:
+#     - nfs-utils
 #
 - name: Set nfs service name depending on OS family
   ansible.builtin.set_fact:
-    nfs_service: "{{ nfs_service_name[ansible_os_family] }}"
+    nfs_service: "{{ nfs_config.server.service_name[ansible_os_family] }}"
 - name: Ensure group exists with specific gid
   ansible.builtin.group:
     name: "{{ item.usergroup }}"
     gid: "{{ item.gid }}"
     state: present
-  loop: "{{ export_table }}"
+  loop: "{{ nfs_config.server.exports }}"
   loop_control:
     label: "{{ item.usergroup }}"
 - name: Add {{ nfs_users }} to usergroup for accessing exported dir
@@ -23,31 +23,37 @@
     groups: "{{ item.1.usergroup }}"
     append: yes
     state: present
-  loop: "{{ nfs_users | product(export_table) }}"
+  loop: "{{ nfs_users | product(nfs_config.server.exports) }}"
   loop_control:
     label: "User {{ item.0 }} to group {{ item.1.usergroup }}"
-- name: Start nfs service
-  ansible.builtin.service:
-    name: "{{ nfs_service }}"
-    state: restarted
 - name: Configure directory for exporting
   ansible.builtin.file:
     path: "{{ item.exporting_dir }}"
     state: directory
     group: "{{ item.usergroup }}"
     mode: 'g+w,g+s'
-  loop: "{{ export_table }}"
+  loop: "{{ nfs_config.server.exports }}"
   loop_control:
     label: "{{ item.exporting_dir }}"
-- name: Configure /etc/exports
-  ansible.builtin.lineinfile:
-    path: /etc/exports
-    line: "{{ item.0.exporting_dir }} \t {{ item.1.host }}({{ item.1.options | join(',') }})"
-    regexp: "^{{ item.0.exporting_dir }}.*"
-    state: present
-    create: true
-  loop: "{{ export_table | subelements('acl') }}"
+- name: Debug /etc/exports
+  ansible.builtin.debug:
+    msg: "{{ item.0.exporting_dir }}\t{{ item.1.host }}({{ item.1.options | join(',') }})"
+  loop: "{{ nfs_config.server.exports | subelements('acl') }}"
+  loop_control:
+    label: "Export: {{ item.0.exporting_dir }} for Host: {{ item.1.host }}"
   when: item.1.options is defined and item.1.options | length > 0
-- name: Reexport all directories
-  ansible.builtin.command: 'exportfs -r'
-  changed_when: true
+  tags: [skipme]
+- name: Configure /etc/exports
+  ansible.builtin.template:
+    src: exports.j2
+    dest: /etc/exports
+    owner: root
+    group: root
+    mode: '0644'
+  notify:
+    - Reexport NFS
+- name: Ensure NFS service is running
+  ansible.builtin.service:
+    name: "{{ nfs_service }}"
+    state: started
+    enabled: true

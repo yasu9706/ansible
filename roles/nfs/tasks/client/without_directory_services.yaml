@@ -1,0 +1,48 @@
+---
+# Following packages are required to use the keybind:
+#   debian:
+#     - nfs-common
+#   redhat:
+#     - nfs-utils
+#
+- name: Ensure group exists with specific gid
+  ansible.builtin.group:
+    name: "{{ item.usergroup }}"
+    gid: "{{ item.gid }}"
+    state: present
+  loop: "{{ nfs_config.client.mounts }}"
+
+- name: Add {{ nfs_users }} to usergroup for accessing exported dir
+  # Variable 'nfs_users' must be defined as list in playbook or host_vars, etc.
+  ansible.builtin.user:
+    name: "{{ item.0 }}"
+    groups: "{{ item.1.usergroup }}"
+    append: yes
+    state: present
+  loop: "{{ nfs_users | product(nfs_config.client.mounts) }}"
+  loop_control:
+    label: "User {{ item.0 }} to group {{ item.1.usergroup }}"
+- name: Ensure that the directory exists for mountpoint
+  ansible.builtin.file:
+    path: "{{ item.mount_point }}"
+    state: directory
+  loop: "{{ nfs_config.client.mounts }}"
+- name: Configure /etc/fstab
+  ansible.builtin.lineinfile:
+    path: /etc/fstab
+    line: "{{ item.server }}:{{ item.dir }} {{ item.mount_point }} nfs {{ item.mount_options | join(',') }} {{ item.dump_field }} {{ item.fsck }}"
+    regexp: "^.*\\s+{{ item.mount_point }}\\s+nfs\\s+.*$"
+    state: present
+    create: true
+  loop: "{{ nfs_config.client.mounts }}"
+- name: systemctl daemon-reload
+  ansible.builtin.systemd:
+    daemon_reload: true
+    # NOTE: systemctl daemon-reload is not always required 
+    #         if you just want to edit fstab.
+    #         You should run this if you want to remount immediately
+- name: remount all
+  ansible.builtin.command: mount -o remount -a
+  changed_when: true
+  # try unmount if no error messages shown but you can't see any files in moutpoint
+

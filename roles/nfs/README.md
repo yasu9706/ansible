@@ -31,6 +31,8 @@ nfsでのエクスポートを行うディレクトリに別ディスクのフ�
 playbookやhost_vars等で上書き可能
 
 ### playbookやhost_vars等で設定が必要なもの
+#### サーバ/クライアント共通
+- nfs_users: エクスポートするディレクトリにアクセスするユーザ名のリスト
 
 
 ## Dependencies
