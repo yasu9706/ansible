@@ -1,0 +1,73 @@
+---
+- name: Check variables
+  block:
+    - name: Display defined NTP sources for verification
+      debug:
+        msg:
+          - "Host: {{ inventory_hostname }}"
+          - "Servers defined: {{ chrony.server_config.servers | default([]) | length }}"
+          - "Pools defined: {{ chrony.server_config.pools | default([]) | length }}"
+          - "Allow Networks: {{ chrony.server_config.allow_networks | default([]) }}"
+
+    - name: Ensure at least one NTP source or allow network is defined
+      assert:
+        that:
+          - "chrony.server_config is defined"
+        fail_msg: "chrony.server_config is missing in host_vars/group_vars!"
+
+- name: Ensure systemd-timesyncd is stopped and disabled
+  block:
+    - name: Check if systemd-timesyncd unit exists
+      # systemctl list-unit-files will return an empty list if not found, preventing module errors
+      command: systemctl list-unit-files systemd-timesyncd.service
+      register: timesyncd_exists
+      changed_when: false
+      failed_when: false
+      check_mode: false
+
+    - name: Stop and disable systemd-timesyncd if present
+      systemd:
+        name: systemd-timesyncd
+        state: stopped
+        enabled: false
+      # Only run if the unit file was actually found in the command output
+      when: "'systemd-timesyncd.service' in timesyncd_exists.stdout"
+      ignore_errors: true
+
+- name: Clean up existing chrony configurations
+  block:
+    - name: Find all existing items in /etc/chrony/
+      find:
+        paths: /etc/chrony/
+        recurse: false
+        file_type: any
+        hidden: true
+      register: chrony_dir_items
+
+    - name: Remove all existing items in /etc/chrony/ to ensure clean state
+      file:
+        path: "{{ item.path }}"
+        state: absent
+      loop: "{{ chrony_dir_items.files }}"
+
+    - name: Ensure /etc/chrony directory exists with correct permissions
+      file:
+        path: /etc/chrony
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
+- name: Deploy custom chrony.conf from template
+  template:
+    src: server/chrony.conf.j2
+    dest: /etc/chrony/chrony.conf
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Restart chrony service to apply changes
+  systemd:
+    name: chrony
+    state: restarted
+    enabled: true

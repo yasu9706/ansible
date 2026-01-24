@@ -1,0 +1,15 @@
+- name: Configure chrony clients
+  hosts: chrony_clients
+  gather_facts: yes
+  become: yes
+
+  tasks:
+    - name: Install required packages
+      ansible.builtin.include_role:
+        name: linux_packages
+        tasks_from: repo_install/main.yaml
+    - name: Configure chrony clients
+      ansible.builtin.include_role:
+        name: chrony
+        tasks_from: clients/main.yaml
+
