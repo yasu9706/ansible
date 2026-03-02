@@ -1,10 +1,4 @@
 ---
-# Following packages are required to use the keybind:
-#   debian:
-#     - nfs-common
-#   redhat:
-#     - nfs-utils
-#
 - name: Ensure group exists with specific gid
   ansible.builtin.group:
     name: "{{ item.usergroup }}"
@@ -12,37 +6,23 @@
     state: present
   loop: "{{ nfs_config.client.mounts }}"
 
-- name: Add {{ nfs_users }} to usergroup for accessing exported dir
-  # Variable 'nfs_users' must be defined as list in playbook or host_vars, etc.
+- name: Add nfs_users to usergroup
   ansible.builtin.user:
-    name: "{{ item.0 }}"
-    groups: "{{ item.1.usergroup }}"
+    name: "{{ item.1 }}"
+    groups: "{{ item.0.usergroup }}"
     append: yes
     state: present
-  loop: "{{ nfs_users | product(nfs_config.client.mounts) }}"
+  loop: "{{ nfs_config.client.mounts | subelements('nfs_users', skip_missing=True) }}"
   loop_control:
-    label: "User {{ item.0 }} to group {{ item.1.usergroup }}"
-- name: Ensure that the directory exists for mountpoint
-  ansible.builtin.file:
-    path: "{{ item.mount_point }}"
-    state: directory
-  loop: "{{ nfs_config.client.mounts }}"
-- name: Configure /etc/fstab
-  ansible.builtin.lineinfile:
-    path: /etc/fstab
-    line: "{{ item.server }}:{{ item.dir }} {{ item.mount_point }} nfs {{ item.mount_options | join(',') }} {{ item.dump_field }} {{ item.fsck }}"
-    regexp: "^.*\\s+{{ item.mount_point }}\\s+nfs\\s+.*$"
-    state: present
-    create: true
-  loop: "{{ nfs_config.client.mounts }}"
-- name: systemctl daemon-reload
-  ansible.builtin.systemd:
-    daemon_reload: true
-    # NOTE: systemctl daemon-reload is not always required 
-    #         if you just want to edit fstab.
-    #         You should run this if you want to remount immediately
-- name: remount all
-  ansible.builtin.command: mount -o remount -a
-  changed_when: true
-  # try unmount if no error messages shown but you can't see any files in moutpoint
+    label: "User {{ item.1 }} to group {{ item.0.usergroup }} (for {{ item.0.mount_point }})"
 
+- name: Configure NFS mounts and ensure they are mounted
+  ansible.posix.mount:
+    path: "{{ item.mount_point }}"
+    src: "{{ item.server }}:{{ item.dir }}"
+    fstype: nfs
+    opts: "{{ item.mount_options | join(',') }}"
+    dump: "{{ item.dump_field }}"
+    passno: "{{ item.fsck }}"
+    state: mounted  # fstabに書き込み、かつ即時マウント（ディレクトリも自動作成）
+  loop: "{{ nfs_config.client.mounts }}"

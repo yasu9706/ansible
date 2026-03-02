@@ -4,5 +4,5 @@
 {{ export.exporting_dir }}
 {%- for acl_entry in export.acl %}
     {{ acl_entry.host }}({{ acl_entry.options | join(',') }})
-{%- endfor %}
+{% endfor %}
 {% endfor %}
