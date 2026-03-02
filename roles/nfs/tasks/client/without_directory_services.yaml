@@ -1,0 +1,28 @@
+---
+- name: Ensure group exists with specific gid
+  ansible.builtin.group:
+    name: "{{ item.usergroup }}"
+    gid: "{{ item.gid }}"
+    state: present
+  loop: "{{ nfs_config.client.mounts }}"
+
+- name: Add nfs_users to usergroup
+  ansible.builtin.user:
+    name: "{{ item.1 }}"
+    groups: "{{ item.0.usergroup }}"
+    append: yes
+    state: present
+  loop: "{{ nfs_config.client.mounts | subelements('nfs_users', skip_missing=True) }}"
+  loop_control:
+    label: "User {{ item.1 }} to group {{ item.0.usergroup }} (for {{ item.0.mount_point }})"
+
+- name: Configure NFS mounts and ensure they are mounted
+  ansible.posix.mount:
+    path: "{{ item.mount_point }}"
+    src: "{{ item.server }}:{{ item.dir }}"
+    fstype: nfs
+    opts: "{{ item.mount_options | join(',') }}"
+    dump: "{{ item.dump_field }}"
+    passno: "{{ item.fsck }}"
+    state: mounted  # fstabに書き込み、かつ即時マウント（ディレクトリも自動作成）
+  loop: "{{ nfs_config.client.mounts }}"

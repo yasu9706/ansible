@@ -1,0 +1,47 @@
+# --- Managed by Ansible (Master NTP Server Configuration) ---
+
+# NTP Servers (External)
+{% for server in chrony.server_config.servers | default([]) %}
+server {{ server.address -}}
+  {%- if server.options is defined -%}
+    {%- for option in server.options %} {{ option }}{% endfor -%}
+  {%- endif %}
+
+{% endfor %}
+
+# NTP Pools (External)
+{% for pool in chrony.server_config.pools | default([]) %}
+pool {{ pool.address -}}
+  {%- if pool.options is defined -%}
+    {%- for option in pool.options %} {{ option }}{% endfor -%}
+  {%- endif %}
+
+{% endfor %}
+
+# Allow NTP client access from local network.
+{% for network in chrony.server_config.allow_networks | default([]) %}
+allow {{ network }}
+{% endfor %}
+
+# Record the rate at which the system clock gains/losses time.
+driftfile /var/lib/chrony/chrony.drift
+
+# Allow the system clock to be stepped in the first three updates
+# if its offset is larger than threshold.
+{% set makestep = chrony.server_config.makestep | default({}) -%}
+makestep {{ makestep.threshold | default('1.0') }} {{ makestep.limit | default('3') }}
+
+# Enable kernel synchronization of the real-time clock (RTC).
+rtcsync
+
+# Serve time even if not synchronized to a time source
+local stratum {{ chrony.server_config.local_stratum | default('10') }}
+
+{% if chrony.server_config.optional_settings is defined and chrony.server_config.optional_settings | length > 0 -%}
+# Optional Settings
+{% for setting in chrony.server_config.optional_settings %}
+# {{ setting.description }}
+{{ setting.value }}
+
+{% endfor %}
+{%- endif %}

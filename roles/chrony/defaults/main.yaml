@@ -1,0 +1,22 @@
+---
+# All variables MUST be nested under chrony to prevent role collisions.
+chrony:
+  server_config:
+    servers:
+      - address: "ntp.nict.jp"
+        options: ["iburst", "prefer"]
+    allow_networks:
+      - "192.168.20.0/24"
+    makestep:
+      threshold: 1.0
+      limit: 3
+    local_stratum: 10
+    optional_settings: []
+  client_config:
+    servers:
+      - address: "{{ internal_ntp_server }}"
+        options: ["iburst"]
+    makestep:
+      threshold: 1.0
+      limit: 3
+    optional_settings: []

@@ -1,0 +1,39 @@
+---
+# 'nfs_config.server.service_name' is not defined in vars/main.yaml 
+#   to enable overriding the service name with playbook, host_vars, etc. 
+#   in special distributions.
+nfs_config:
+  server:
+    service_name:
+      Debian: nfs-kernel-server
+      RedHat: nfs-server
+
+    # list for configuring /etc/exports
+    exports:
+      - exporting_dir: /var/nfs01
+        acl:
+          - host: '*'
+            options:
+              - 'rw'
+              - 'no_subtree_check'
+              - 'sync'
+              - 'fsid=0'
+        usergroup: nfs_rw01
+        gid: 2049
+        nfs_users:
+          - ubuntu
+
+  client:
+    # list for configuring fstab
+    mounts:
+      - usergroup: nfs_rw01
+        gid: 2049
+        server: somehost_or_ip_address
+        dir: /
+        mount_point: /mnt/nfs01
+        mount_options:
+          - defaults
+        dump_field: 0
+        fsck: 0
+        nfs_users:
+          - ubuntu

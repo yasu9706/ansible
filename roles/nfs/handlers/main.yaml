@@ -1,0 +1,5 @@
+---
+# handlers file for role_skelton
+- name: Reexport NFS
+  ansible.builtin.command: 'exportfs -ar'
+  changed_when: true
