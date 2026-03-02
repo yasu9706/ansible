@@ -1,5 +1,5 @@
 ---
-# 'nfs_service_name' is not defined in vars/main.yaml 
+# 'nfs_config.server.service_name' is not defined in vars/main.yaml 
 #   to enable overriding the service name with playbook, host_vars, etc. 
 #   in special distributions.
 nfs_config:
@@ -16,10 +16,12 @@ nfs_config:
             options:
               - 'rw'
               - 'no_subtree_check'
-              - 'async'
+              - 'sync'
               - 'fsid=0'
         usergroup: nfs_rw01
         gid: 2049
+        nfs_users:
+          - ubuntu
 
   client:
     # list for configuring fstab
@@ -33,3 +35,5 @@ nfs_config:
           - defaults
         dump_field: 0
         fsck: 0
+        nfs_users:
+          - ubuntu

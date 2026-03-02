@@ -16,22 +16,22 @@
   loop: "{{ nfs_config.server.exports }}"
   loop_control:
     label: "{{ item.usergroup }}"
-- name: Add {{ nfs_users }} to usergroup for accessing exported dir
+- name: Add nfs_users to usergroup for accessing exported dir
   # Variable 'nfs_users' must be defined as list in playbook or host_vars, etc.
   ansible.builtin.user:
-    name: "{{ item.0 }}"
-    groups: "{{ item.1.usergroup }}"
+    name: "{{ item.1 }}"
+    groups: "{{ item.0.usergroup }}"
     append: yes
     state: present
-  loop: "{{ nfs_users | product(nfs_config.server.exports) }}"
+  loop: "{{ nfs_config.server.exports | subelements('nfs_users', skip_missing=True) }}"
   loop_control:
-    label: "User {{ item.0 }} to group {{ item.1.usergroup }}"
+    label: "User {{ item.1 }} to group {{ item.0.usergroup }} (for {{ item.0.exporting_dir }})"
 - name: Configure directory for exporting
   ansible.builtin.file:
     path: "{{ item.exporting_dir }}"
     state: directory
     group: "{{ item.usergroup }}"
-    mode: 'g+w,g+s'
+    mode: 'g+w,g+x,g+s'
   loop: "{{ nfs_config.server.exports }}"
   loop_control:
     label: "{{ item.exporting_dir }}"

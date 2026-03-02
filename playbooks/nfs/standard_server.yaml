@@ -1,14 +1,8 @@
 ---
 - name: Configure standard nfs servers
-  hosts: all
+  hosts: nfs_servers
   gather_facts: yes
   become: yes
-  vars:
-    packages:
-      debian:
-        - nfs-kernel-server
-      redhat:
-        - nfs-utils
   tasks:
   - ansible.builtin.include_role:
       name: linux_packages
