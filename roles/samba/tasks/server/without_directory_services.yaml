@@ -1,0 +1,68 @@
+---
+# Following packages are required
+#   debian:
+#     - samba
+#   redhat:
+#     - samba
+#
+# - name: Set samba service name depending on OS family
+#   ansible.builtin.set_fact:
+#     smb_service: "{{ smb.server.service_name[ansible_os_family] }}"
+- name: Configure users for accessing shared directories
+  block:
+    - name: Ensure group exists with specific gid
+      ansible.builtin.group:
+        name: "{{ item.shared_dir.group }}"
+        gid: "{{ item.shared_dir.gid }}"
+        state: present
+      loop: "{{ smb.server.config.sections }}"
+      loop_control:
+        label: "{{ item.shared_dir.group }}"
+    - name: Ensure the user is in specific group
+      ansible.builtin.user:
+        name: "{{ item.1 }}"
+        groups: "{{ item.0.shared_dir.group }}"
+        append: true
+      loop: "{{ smb.server.config.sections | subelements([ 'shared_dir', 'users'] ) }}"
+      loop_control:
+        label: "User: {{ item.1 }} -> Group: {{ item.0.shared_dir.group }}"
+    - name: Set samba password for smbuser 
+      block:
+        - name: Fetch current smbpasswd users
+          ansible.builtin.shell:
+            cmd: /usr/bin/pdbedit -L
+          register: pdb_users
+          changed_when: false
+          failed_when: false
+        - name: Set samba password for each user
+          ansible.builtin.shell:
+            stdin: |
+              "{{ lookup('file', item.passwd_file)| rstrip }}"
+              "{{ lookup('file', item.passwd_file)| rstrip }}"
+            cmd: /usr/bin/smbpasswd -s -a {{ item.name }}
+          when: "item.name not in pdb_users.stdout"
+          loop: "{{ smb.server.users }}"
+          loop_control:
+            label: "Setting SMB password for: {{ item.name }}"
+- name: Configure shared directory
+  ansible.builtin.file:
+    path: "{{ item.shared_dir.dirname }}"
+    state: directory
+    mode: '2770'
+    group: "{{ item.shared_dir.group }}"
+    recurse: true
+  loop: "{{ smb.server.config.sections }}"
+  loop_control:
+    label: "Configuring shared directory: {{ item.name }}"
+- name: Configure /etc/samba/smb.conf
+  ansible.builtin.template:
+    src: server/smb.conf.j2
+    dest: /etc/samba/smb.conf
+    owner: root
+    group: root
+    mode: '0644'
+- name: Ensure SMB service is running
+  ansible.builtin.service:
+    name: smbd
+    state: restarted
+      #enabled: true

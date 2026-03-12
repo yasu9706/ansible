@@ -1,0 +1,16 @@
+---
+- name: Configure standard samba servers
+  hosts: nfs_servers
+  gather_facts: yes
+  become: yes
+  tasks:
+    #- name: Debug variables
+    #  ansible.builtin.debug:
+    #    var: smb.server
+  - ansible.builtin.include_role:
+      name: linux_packages
+      tasks_from: repo_install/main.yaml
+  - ansible.builtin.include_role:
+      name: samba
+      tasks_from: server/without_directory_services.yaml
+

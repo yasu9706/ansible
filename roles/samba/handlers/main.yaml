@@ -1,0 +1,6 @@
+---
+# In order to use this handler, use `notify: notify_value` in task file
+- name: notify_value
+  ansible.builtin.include_tasks:
+    file: __taskfile_in_tasks_dir.yaml
+
