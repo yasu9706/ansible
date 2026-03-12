@@ -1,0 +1,12 @@
+[global]
+{% for parameter in smb.server.config.global_parameters %}
+    {{ parameter.name }} = {{ parameter.value }}
+{% endfor %}
+
+{% for section in smb.server.config.sections %}
+[{{ section.name }}]
+    {% for parameter in section.parameters -%}
+    {{ parameter.name }} = {{ parameter.value }}
+    {% endfor %}
+
+{% endfor %}
