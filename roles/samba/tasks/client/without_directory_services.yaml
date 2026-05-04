@@ -1,0 +1,64 @@
+---
+# 本タスクファイルを実行する前に以下のパッケージがインストールされている必要があります。
+- name: 共有ディレクトリへアクセスするグループの設定
+  ansible.builtin.group:
+    name: "{{ item.usergroup }}"
+    gid: "{{ item.gid }}"
+    state: present
+  loop: "{{ smb.client.mounts }}"
+
+- name: 共有ディレクトリへアクセスするユーザの設定
+  ansible.builtin.user:
+    name: "{{ item.1 }}"
+    groups: "{{ item.0.usergroup }}"
+    append: yes
+  loop: "{{ smb.client.mounts | subelements('guest_users') }}"
+
+- name: マウントポイントの設定
+  ansible.builtin.file:
+    path: "{{ item.0.dest }}"
+    state: directory
+    mode: '0755'
+    owner: "{{ item.1 }}"
+    group: "{{ item.0.usergroup }}"
+  loop: "{{ smb.client.mounts | subelements('guest_users') }}"
+
+- name: credentialsディレクトリの作成
+  ansible.builtin.file:
+    path: "/etc/samba/{{ item.server }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0700'
+  loop: "{{ smb.client.mounts }}"
+
+- name: .smbcredentialsファイルの配布
+  ansible.builtin.template:
+    src: client/smbcredentials.j2
+    dest: "/etc/samba/{{ item.server }}/.smbcredentials"
+    owner: root
+    group: root
+    mode: '0600'
+  loop: "{{ smb.client.mounts }}"
+
+- name: fstabへの登録とマウントの適用
+  ansible.posix.mount:
+    path: "{{ item.dest }}"
+    src: "{{ item.src }}"
+    fstype: cifs
+    opts: "{{ item.options | join(',') }}"
+    dump: "{{ item.dump_field }}"
+    passno: "{{ item.fsck }}"
+    state: mounted
+  loop: "{{ smb.client.mounts }}"
+
+- name: systemd daemon-reload
+  ansible.builtin.systemd_service:
+    daemon_reload: true
+
+- name: サービス再起動 (open-vm-tools / systemd-mount などが必要な場合)
+  ansible.builtin.service:
+    name: "{{ smb.client.service_name[ansible_os_family] | default('smbd') }}"
+    state: restarted
+    enabled: true
+  when: smb.client.service_name is defined

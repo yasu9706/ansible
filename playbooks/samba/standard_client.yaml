@@ -1,0 +1,14 @@
+---
+- name: Configure standard samba client
+  hosts: smb_clients
+  gather_facts: yes
+  become: yes
+  tasks:
+  - ansible.builtin.include_role:
+      name: linux_packages
+      tasks_from: repo_install/main.yaml
+  - ansible.builtin.include_role:
+      name: samba
+      tasks_from: client/without_directory_services.yaml
+
+

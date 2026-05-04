@@ -1,7 +1,4 @@
 ---
-# 'nfs_config.server.service_name' is not defined in vars/main.yaml 
-#   to enable overriding the service name with playbook, host_vars, etc. 
-#   in special distributions.
 smb:
   server:
     service_name:
@@ -57,14 +54,14 @@ smb:
   client:
     # list for configuring fstab
     mounts:
-      - usergroup: nfs_rw01
-        gid: 2049
+      - usergroup: smb_rw01_generic
+        gid: 2048
         server: somehost_or_ip_address
-        dir: /
-        mount_point: /mnt/nfs01
-        mount_options:
+        src: //192.168.20.1/Images
+        dest: /mnt/smb01/Images
+        options:
           - defaults
         dump_field: 0
         fsck: 0
-        nfs_users:
+        guest_users:
           - ubuntu
