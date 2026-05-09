@@ -1,0 +1,5 @@
+---
+rsyslog:
+  server:
+    client_log_dir: /var/log/homelab
+    template_name: server/rsyslog.conf.j2
