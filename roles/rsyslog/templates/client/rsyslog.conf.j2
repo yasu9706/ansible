@@ -1,0 +1,46 @@
+# /etc/rsyslog.conf - Managed by Ansible (Client Role)
+
+module(load="imuxsock")
+module(load="imklog")
+
+# グローバル設定
+global(
+workDirectory="{{ rsyslog.client.spool_dir | default('/var/spool/rsyslog')}}"
+    umask="0022"
+    privdrop.user.name="root"
+    privdrop.group.name="root"
+)
+
+module(load="builtin:omfile"
+    Template="RSYSLOG_TraditionalFileFormat"
+    FileOwner="root"
+    FileGroup="root"
+    FileCreateMode="0640"
+    DirCreateMode="0755"
+)
+
+action(type="omfwd"
+    target="{{ rsyslog.client.server_ip }}"
+    port="{{ rsyslog.client.port | default('514') }}"
+    protocol="{{ rsyslog.client.protocol | default('tcp') }}"
+    action.resumeRetryCount="-1"
+    action.resumeInterval="10"
+    queue.type="linkedlist"
+    queue.filename="spool_to_central"
+    queue.maxdiskspace="500m"
+    queue.saveonshutdown="on"
+)
+
+########################
+#### LOCAL LOGGING  ####
+########################
+
+if ( $syslogfacility-text == "auth"
+     or $syslogfacility-text == "authpriv" ) then {
+    action(type="omfile" file="/var/log/auth.log")
+    stop
+}
+
+action(type="omfile" file="/var/log/syslog")
+
+include(file="/etc/rsyslog.d/*.conf" mode="optional")
