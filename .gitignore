@@ -4,3 +4,6 @@ inventory.ini
 # host_vars
 host_vars/*
 !host_vars/sample.yaml
+
+encrypted_files/*
+ansible.cfg

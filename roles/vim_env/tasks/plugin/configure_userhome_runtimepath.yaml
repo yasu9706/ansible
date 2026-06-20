@@ -1,6 +1,6 @@
 ---
 - name: create directory `~/.vim`
-  # variable `target_user` must be defined in playbook
+  # Variable `target_user` must be defined in the playbook or host_vars
   ansible.builtin.file:
     path: "~{{target_user}}/.vim"
     owner: "{{target_user}}"

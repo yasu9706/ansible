@@ -1,5 +1,5 @@
 - name: distribute minimum_vimrc
-  # Variable `target_user` must be declared in playbooks
+  # Variable `target_user` must be defined in the playbook or host_vars
   ansible.builtin.copy:
     src: minimum_vimrc.vim
     dest: "~{{ target_user}}/.vimrc"

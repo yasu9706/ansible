@@ -13,7 +13,8 @@ sudo apt update && sudo apt install ${NECESSARY[@]} ${RECOMMENDED[@]}
 #   (Since `$PWD` includes `/` in its value, you should use `|`, comma,
 #   or any other character instead of `/` as sed delimiter)
 sed "s|^\(inventory=\).*\$|\1$PWD/inventory.ini|" -i ./ansible.cfg
-sed "s|^\(ansible_base_dir: \).*\$|\1$PWD|"       -i ./vars/all.yaml
+
+mkdir encrypted_files fetch_dest
 ```
 
 ## Requirements

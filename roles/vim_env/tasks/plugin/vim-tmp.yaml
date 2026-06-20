@@ -1,5 +1,5 @@
 ---
-  # variable `target_user` must be defined in playbook
+  # Variable `target_user` must be defined in the playbook or host_vars
 - name: create directory `~/.vim/back`
   ansible.builtin.file:
     path: "~{{target_user}}/.vim/back"

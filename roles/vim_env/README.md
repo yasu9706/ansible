@@ -14,22 +14,11 @@ vimrc側ではそこを読み込む形で設定を行う。
 - distribute_minimum_vimrc: vimrcを配布する。`runtime! plugin/**/*.vim`  
   のような記載も末尾に加える
 - plugin: pluginsを作成するタスクの集合
-  - configure_userhome_runtimepath: ディレクトリ`~/.vim`を作成   
-  - vim-tmp: backups, swap, viewなどの設定
-  - filetype_override
-  - keymaps
-  - wildmenu
-  - 80chars_marker
-- ftplugin
-  - markdown
-- pack
-  - lightline: https://github.com/itchyny/lightline.vim.gitをクローン  
-    set laststatus=2も設定する
-  - vim-jinja2-syntax
-  - vim-markdown-folding
-  - vim-yaml-folds
+- ftplugin: ftpluginを作成するタスクの集合
+- pack: vim packagesをインストールする作業の集合
 
 vim packagesはgit cloneと標準のパッケージ機能を使用する。  
 gitは別ロールlinux_packagesを利用してインストールする。
 
+## 今後の計画
 

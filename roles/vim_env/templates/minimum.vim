@@ -111,7 +111,8 @@ let g:markdown_fenced_languages = [
             \ 'dockerfile', 
             \ 'nginx',
             \ 'xml',
-            \ 'dosini'
+            \ 'dosini',
+            \ 'deb822sources'
             \ ]
 
 set wildmode=longest,full
