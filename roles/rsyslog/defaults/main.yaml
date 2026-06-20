@@ -1,0 +1,10 @@
+---
+# All variables MUST be nested under rsyslog to prevent role collisions.
+rsyslog:
+  server:
+    client_log_dir: /var/log/homelab
+    template_name: server/rsyslog.conf.j2
+  client:
+    server_ip: 'rsyslog-server01'
+    config:
+      main: client/rsyslog.conf.j2

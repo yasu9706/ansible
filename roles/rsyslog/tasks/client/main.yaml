@@ -1,0 +1,63 @@
+---
+- name: Clean up existing rsyslog configurations
+  block:
+    - name: Remove existing rsyslog.conf and rsyslog.d
+      file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /etc/rsyslog.conf
+        - /etc/rsyslog.d
+
+    - name: Recreate rsyslog.d directory
+      file:
+        path: /etc/rsyslog.d
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
+- name: Configure rsyslog spool directory
+  block:
+    # - name: Ensure syslog user exists with specific UID
+    #   user:
+    #     name: syslog
+    #     uid: 10514
+    #     group: adm
+    #     shell: /usr/sbin/nologin
+    #     system: true
+    #     create_home: false
+    #     state: present
+
+    - name: Ensure rsyslog spool directory exists
+      file:
+        path: "{{ rsyslog.client.spool_dir | default('/var/spool/rsyslog') }}"
+        state: directory
+        owner: root
+        group: root
+        mode: '0700'
+
+- name: Deploy rsyslog client configuration
+  block:
+    - name: Deploy main rsyslog.conf from template
+      template:
+        src: "{{ rsyslog.client.config.main }}"
+        dest: /etc/rsyslog.conf
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Deploy additional configurations to rsyslog.d
+      template:
+        src: "client/rsyslog.d/{{ item.src }}"
+        dest: "/etc/rsyslog.d/{{ item.dest }}"
+        owner: root
+        group: root
+        mode: '0644'
+      loop: "{{ rsyslog.client.config.additional | default([]) }}"
+
+- name: Restart rsyslog service to apply changes
+  systemd:
+    name: rsyslog
+    state: restarted
+    enabled: true

@@ -3,9 +3,7 @@
 - name: Update apt cache and check for updates
   ansible.builtin.apt:
     update_cache: yes
-  register: apt_update_result
 
 - name: Upgrade all packages on Debian hosts
   ansible.builtin.apt:
     upgrade: yes
-  when: apt_update_result.changed

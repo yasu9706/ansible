@@ -1,0 +1,63 @@
+##########################
+#### INTERNAL LOGGING ####
+##########################
+
+module(load="imuxsock")
+module(load="imklog")
+module(load="imudp")
+module(load="imtcp")
+input(type="imudp" port="514")
+input(type="imtcp" port="514")
+
+template(name="TmplHomelabHost" type="string" 
+    string="{{ rsyslog.server.client_log_dir}}/%HOSTNAME%/%PROGRAMNAME%.log")
+
+
+{# TODO: use variable for client ip#}
+if ( $inputname == "imuxsock"
+     or $fromhost-ip == "127.0.0.1" 
+     or $fromhost-ip startswith "192.168." ) then {
+
+    action(type="omfile" file="{{ rsyslog.server.client_log_dir }}/combined_timeline.log")
+
+    if ( $programname contains "nfs" 
+         or $programname contains "smb" 
+         or $msg contains "mount" 
+         or $msg contains "zfs" ) then {
+         action(type="omfile" file="{{ rsyslog.server.client_log_dir }}/storage.log")
+    }
+
+    if ( $programname contains "ups" 
+         or $programname contains "apcupsd" 
+         or $msg contains "power" 
+         or $msg contains "shutdown" ) then {
+         action(type="omfile" file="{{ rsyslog.server.client_log_dir }}/power_mgmt.log")
+    }
+
+    if ( $programname contains "sshd" 
+         or $programname contains "sudo" 
+         or $programname contains "dhcp" 
+         or $msg contains "Link is Up" 
+         or $msg contains "Link is Down" 
+         or $msg contains "eth0" 
+         or $msg contains "enp" ) then {
+         action(type="omfile" file="{{ rsyslog.server.client_log_dir }}/network_auth.log")
+    }
+
+    action(type="omfile" dynaFile="TmplHomelabHost")
+
+    if ( $fromhost-ip != "127.0.0.1" and $inputname != "imuxsock" ) then stop
+}
+
+########################
+#### LOCAL LOGGING  ####
+########################
+
+
+if ( $syslogfacility-text == "auth" 
+     or $syslogfacility-text == "authpriv" ) then {
+    action(type="omfile" file="/var/log/auth.log")
+    stop
+}
+
+action(type="omfile" file="/var/log/syslog")

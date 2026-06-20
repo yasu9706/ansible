@@ -1,0 +1,67 @@
+---
+smb:
+  server:
+    service_name:
+      Debian: smbd
+      RedHat: smbd
+
+    users:
+      - name: Alice
+        passwd_file: /etc/ansible/encrypted_passwd_alice
+      - name: Bob
+        passwd_file: "{{ ansible_base_dir }}/encrypted_files/{{ inventory_hostname }}/encrypted_passwd_bob"
+
+    config:
+      global_parameters:
+        - name: workgroup
+          value: WORKGROUP
+        - name: server string
+          value: NAS01
+        - name: security
+          value: user
+        - name: map to guest
+          value: bad user
+      sections:
+        - name: Images
+          parameters:
+            - name: path
+              value: /tank/data/Images
+            - name: browseable
+              value: 'yes'
+            - name: read only
+              value: 'no'   #Without quotation, a string 'False' will be outputted on config file
+            - name: valid users
+              value: '@smb_rw01'
+          shared_dir:
+            dirname: /var/exports/smb/share01
+            group: smb_rw01
+            gid: 2048
+            users: [Alice, Bob]
+        - name: Images
+          parameters:
+            - name: path
+              value: /tank/data/Movies
+            - name: read only
+              value: no
+            - name: valid users
+              value: '@smb_rw01'
+          shared_dir:
+            dirname: /var/exports/smb/share02
+            group: smb_rw01
+            gid: 2048
+            users: [Alice]
+
+  client:
+    # list for configuring fstab
+    mounts:
+      - usergroup: smb_rw01_generic
+        gid: 2048
+        server: somehost_or_ip_address
+        src: //192.168.20.1/Images
+        dest: /mnt/smb01/Images
+        options:
+          - defaults
+        dump_field: 0
+        fsck: 0
+        guest_users:
+          - ubuntu

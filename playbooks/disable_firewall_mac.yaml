@@ -8,9 +8,11 @@
     ansible.builtin.include_role:
       name: linux_firewall
       tasks_from: disable_main.yaml
+    tags: disable_firewall
 
   - name: Disable MAC (Apparmor/SELinux)
     ansible.builtin.include_role:
       name: mandatory_access_control
       tasks_from: disable_main.yaml
+    tags: disable_mac
 

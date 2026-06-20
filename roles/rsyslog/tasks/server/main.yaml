@@ -1,0 +1,30 @@
+---
+- name: Clean up existing rsyslog configurations
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /etc/rsyslog.conf
+    - /etc/rsyslog.d
+
+- name: Ensure client log directory exists
+  file:
+    path: "{{ rsyslog.server.client_log_dir }}"
+    state: directory
+    owner: syslog
+    group: adm
+    mode: '0755'
+
+- name: Deploy custom rsyslog.conf from template
+  template:
+    src: "{{ rsyslog.server.template_name }}"
+    dest: /etc/rsyslog.conf
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Restart rsyslog service to apply changes
+  systemd:
+    name: rsyslog
+    state: restarted
+    enabled: true
