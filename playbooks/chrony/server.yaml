@@ -4,10 +4,8 @@
   become: yes
 
   tasks:
-  - ansible.builtin.include_role:
-      name: linux_packages
-      tasks_from: repo_install/main.yaml
-  - ansible.builtin.include_role:
-      name: chrony
-      tasks_from: server/main.yaml
+    - name: configure chrony server using role chrony
+      ansible.builtin.include_role:
+        name: chrony
+        tasks_from: server/main.yaml
 

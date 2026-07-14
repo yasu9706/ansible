@@ -1,6 +1,9 @@
 ---
 # All variables MUST be nested under chrony to prevent role collisions.
 chrony:
+  packages:
+    Debian: ['chrony']
+    Redhat: ['chrony']  # RedHat?
   server_config:
     servers:
       - address: "ntp.nict.jp"

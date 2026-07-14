@@ -1,4 +1,9 @@
 ---
+- name: Install required packages
+  ansible.builtin.package:
+    name: "{{ chrony.packages[ansible_os_family] }}"
+    state: present
+
 - name: Check client variables
   block:
     - name: Display defined NTP sources for client
